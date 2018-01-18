@@ -654,6 +654,22 @@ class ssh (
     validate_string($sshd_authorized_keys_command_user)
   }
 
+  # The configuration key for the authorized_keys_command_user is different on systems
+  # where osfamily=Redhat and operatingsystemmajrelease < 7.
+  case $::osfamily {
+    'RedHat': {
+      $osmajver = 0 + $::operatingsystemmajrelease
+      if $osmajver < 7 {
+        $sshd_authorized_keys_command_user_key = 'AuthorizedKeysCommandRunAs'
+      } else {
+        $sshd_authorized_keys_command_user_key = 'AuthorizedKeysCommandUser'
+      }
+    }
+    default: {
+      $sshd_authorized_keys_command_user_key = 'AuthorizedKeysCommandUser'
+    }
+  }
+
   if $sshd_config_match != undef {
     validate_hash($sshd_config_match)
   }
