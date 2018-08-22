@@ -288,8 +288,8 @@ class ssh (
 
   if "${::ssh_version}" =~ /^OpenSSH/  { # lint:ignore:only_variable_string
     $ssh_version_array = split($::ssh_version_numeric, '\.')
-    $ssh_version_maj_int = 0 + $ssh_version_array[0]
-    $ssh_version_min_int = 0 + $ssh_version_array[1]
+    $ssh_version_maj_int = $ssh_version_array[0].scanf("%i")
+    $ssh_version_min_int = $ssh_version_array[1].scanf("%i")
     if $ssh_version_maj_int > 5 {
       $default_ssh_config_use_roaming = 'no'
     } elsif $ssh_version_maj_int == 5 and $ssh_version_min_int >= 4 {
@@ -662,7 +662,7 @@ class ssh (
   # where osfamily=Redhat and operatingsystemmajrelease < 7.
   case $::osfamily {
     'RedHat': {
-      $osmajver = 0 + $::operatingsystemmajrelease
+      $osmajver = $::operatingsystemmajrelease.scanf("%i")
       if $osmajver < 7 {
         $sshd_authorized_keys_command_user_key = 'AuthorizedKeysCommandRunAs'
       } else {
